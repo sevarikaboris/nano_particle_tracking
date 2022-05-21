@@ -1,6 +1,8 @@
+from curses.panel import top_panel
 from email.mime import base
 import math
 import os
+from turtle import left, right
 import numpy as np
 import tensorflow as tf
 from keras.models import load_model
@@ -61,19 +63,60 @@ for j in range(size_of_folder):
                             img2Name = [basepath folder{j}{i} '\fov' int2str(fovIMG) '\fov' int2str(fovIMG) '_0' int2str(trnconcat(pos,3)) '.tif'];
                         
 
-                        img = ((imread(img2Name)));
+                        img = Image.open(img2Name);
 
-                        imgSel = imcrop(img,[(trnconcat(pos,1)-20) (trnconcat(pos,2)-20) 40 40]);
-                        imgSel = imresize(imgSel,[224 224]);
-                        imgSel = reshape(imgSel,224,224,3);
+                        #left, up, right, bottom
+                        left = trnconcat(pos,1)-20
+                        top = (trnconcat(pos,2)-20)
+                        right = 40  #maybe left + 40?
+                        bottom = 40 #maybe top + 40?
                         
-                        X_after_vgg = predict(vgg16_model,imgSel);
-                        X_after_vgg = reshape(X_after_vgg,[7 7 512]);
+                        imgSel = img.crop(left, top, right, bottom)
+                        imgSel = imgSel.resize(224, 224)
+                        imgSel = np.asarray(imgSel).reshape(1, 224, 224, 3)
 
-                        imgSel = reshape(imgSel,[7,7,512]);
+                        #imgSel = imcrop(img,[(trnconcat(pos,1)-20) (trnconcat(pos,2)-20) 40 40]);
+                        #imgSel = imresize(imgSel,[224 224]);
+                        #imgSel = reshape(imgSel,224,224,3);
                         
-                        label = predict(net, X_after_vgg);
-                        text(10, 20, char(label),'Color','white')                        
+                        image = preprocess_input(image)
+
+                        #image.shape
+                        vgg16_model = VGG16(include_top=False, input_shape=(224, 224, 3))
+
+                        X_after_vgg = vgg16_model.predict(image)
+
+                        X_after_vgg.shape
+
+                        model = load_model("C:/Users/Jerome's Laptop/Desktop/Boris_KI/particle.h5")
+                        x = model.predict(X_after_vgg)
+                        print(x)
+
+                        if x >= 0.9: 
+                            print("is Particle")
+                            is_particle = True
+                        else : 
+                            print("not a Particle")
+                            is_particle = False
+
+                        
+                        #write to file (it is not possible to alter a specific line or row)
+                        #so you have to read all, change a specific line with this and overwrite the file
+                        #completely
+
+                        filename = "table.txt"
+                        with open(filename, 'r') as file:
+                            file_lines = file.readlines()
+
+                        line_position_of_table = 3      #I dont know
+                        file_lines[1] = x+'\n'          #'\n' means newline
+
+                        # and write everything back
+                        with open(filename, 'w') as file:
+                            file.writelines(file_lines)
+
+                        #label = predict(net, X_after_vgg);
+                        #text(10, 20, char(label),'Color','white')                        
 
 
 
