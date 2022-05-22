@@ -24,45 +24,57 @@ def transpose_matrix(matrix):
 #    print(dirs)
 #    dir_list = dirs
 
-#print("files:")
-#print(dir_list)
+# #print("files:")
+# #print(dir_list)
 
-#result = len(os.listdir("C:/Users/Jerome's Laptop/Desktop/Hauptordner"))
-#print(result)
+# #result = len(os.listdir("C:/Users/Jerome's Laptop/Desktop/Hauptordner"))
+# #print(result)
 
-#file = tables.open_file('tracked_particles_dedrift.mat')
-file = loadmat('tracked_particles_dedrift.mat')
-lists = file['concat_ptcl2']
-#print(lists)
-#print(lists[4])
-tr = list(map(list, zip(*lists)))
-fov_index_list = list() #fov_index_list[video_nr][i] = index
+# #file = tables.open_file('tracked_particles_dedrift.mat')
+# file = loadmat('tracked_particles_dedrift.mat')
+# lists = file['concat_ptcl2']
+# #print(lists)
+# #print(lists[4])
+# tr = list(map(list, zip(*lists)))
+# fov_index_list = list() #fov_index_list[video_nr][i] = index
 
-min_of_series = int(min(tr[4]))
-max_of_series = int(max(tr[4]))
-fov_index_list = [[] for y in range(max_of_series)]
+# min_of_series = int(min(tr[4]))
+# max_of_series = int(max(tr[4]))
+# fov_index_list = [[] for y in range(max_of_series)]
 
-for index, value in enumerate(tr[4]):
-    fov_index_list[int(value)-1].append(index)
-#print(fov_index_list)
+# for index, value in enumerate(tr[4]):
+#     fov_index_list[int(value)-1].append(index)
+# #print(fov_index_list)
 
-#print(fov_index_list[9])
-#print(max(tr[4]))
+# #print(fov_index_list[9])
+# #print(max(tr[4]))
 
-for fovs in fov_index_list:
-    FOV = list()
-    for index in fovs:
-        FOV.append(lists[index])
+# for fovs in fov_index_list:
+#     FOV = list()
+#     for index in fovs:
+#         FOV.append(lists[index])
 
-    FOV = list(map(list, zip(*FOV)))
-    bevor = 1
-    for particleid in FOV[3]:
-        if(bevor != particleid):
-            print(particleid)
-            bevor = particleid
+#     FOV = list(map(list, zip(*FOV)))
+#     bevor = 1
+#     for particleid in FOV[3]:
+#         if(bevor != particleid):
+#             print(particleid)
+#             bevor = particleid
 
-#for fov in range(int(min(tr[4])),int(max(tr[4])+1)): #fov zelle mit partikel
-#    print(fov)
+# #for fov in range(int(min(tr[4])),int(max(tr[4])+1)): #fov zelle mit partikel
+# #    print(fov)
 
-indices = tr[4].index(1)
-#print(indices)
+# indices = tr[4].index(1)
+# #print(indices)
+
+basepath = "C:/Users/Jerome's Laptop/Desktop/Hauptordner/" #path where experiments are located
+for experiment_dir in os.listdir(basepath):
+    experiment_dir += "/"
+    print("processing: " + experiment_dir)
+    table_with_result = list() #only initializing here
+    table_with_result_index = 0
+    for videos_dir in os.listdir(basepath + experiment_dir):
+        if(not os.path.isdir(basepath + experiment_dir + videos_dir)):
+            continue
+        print("videos"  + videos_dir)
+            
