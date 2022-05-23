@@ -8,6 +8,7 @@ from PIL import Image
 from scipy.io import loadmat
 import time
 from multiprocessing import Pool
+import random
 
 #test commit
 
@@ -22,7 +23,7 @@ core_count = 4
 cores_in_use = 0
 file_dirs = list()
 experiment_dir = ""
-probability = 10 #%
+probability = 0.1 #%
 
 def transpose_matrix(matrix):
     return list(map(list, zip(*matrix)))
@@ -66,6 +67,14 @@ def evaluate_table(mat_file_path):
 
 
     for concat_row in concat_ptcl2:
+
+        if(random.random()>probability):
+            for i in range(5):
+                table_with_result[table_with_result_index][i] = concat_row[i]
+            table_with_result[table_with_result_index][5] = 10.0
+            table_with_result_index += 1
+            continue
+
         picture_number = int(concat_row[2])
         if picture_number <10:
             number = '_000' + str(picture_number)
