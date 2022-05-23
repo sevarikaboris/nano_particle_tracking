@@ -21,6 +21,7 @@ core_count = 4
 cores_in_use = 0
 file_dirs = list()
 experiment_dir = ""
+probability = 10 #%
 
 def transpose_matrix(matrix):
     return list(map(list, zip(*matrix)))
