@@ -16,7 +16,7 @@ savepath = 'C:/Users/sevar/OneDrive/Radna površina/Data/Fotos/'
 model = load_model("C:/Users/Jerome's Laptop/Desktop/Boris_KI/particle.h5")
 
 #change this value
-dedrift = True
+dedrift = False
 core_count = 4
 cores_in_use = 0
 file_dirs = list()
@@ -27,16 +27,44 @@ def transpose_matrix(matrix):
     return list(map(list, zip(*matrix)))
 
 def evaluate_table(mat_file_path):
-    mat_file = loadmat(mat_file_path)
-    concat_ptcl2 = mat_file['concat_ptcl2'] #read the file
-    #savename = basepath + experiment_dir + videos_dir
+    for mat_file_path in os.listdir(basepath):
+        mat_file_path += "/"
+    print("processing: " + mat_file_path)
 
+    if not dedrift:
+        file_name = '/tracked_particles.mat'
+    elif dedrift:
+        file_name = '/tracked_particles_dedrift.mat'
+
+    mat_file = loadmat(basepath + mat_file_path + file_name)
+    concat_ptcl2 = mat_file['concat_ptcl2'] #read the file
+    
+    video_folder_list = list()
+    counter_fov = 0
+    for videos_fov_dir in os.listdir(basepath + mat_file_path):
+        if(not os.path.isdir(basepath + mat_file_path + videos_fov_dir)):
+            continue
+        
+        number = counter_fov
+        if(counter_fov == 1):
+            number = 1
+        elif(counter_fov == 2):
+            number = 10
+        else:
+            number = counter_fov -1
+
+        video_folder_list.append("fov" + number)
+
+
+    #"E:\Particle Set 2\100 nm - C 1.0 - 1\fov1\fov1_0001.tif"
+    
     row, col = concat_ptcl2.shape               #get rows and cols of mat_file
     table_with_result = np.zeros(shape=(row,6)) #initializing resulting table. it is faster to fill the array with zeros beforehand, than appending and copying tables
     table_with_result_index = 0                 #navigating index 
 
+
+
     for concat_row in concat_ptcl2:
-        ti = time.time()
         picture_number = int(concat_row[2])
         if picture_number <10:
             number = '_000' + str(picture_number)
@@ -45,7 +73,7 @@ def evaluate_table(mat_file_path):
         else:
             number = '_0' + str(picture_number)
 
-        img2Name = basepath + experiment_dir + videos_dir +  'fov1' +number + '.tif'
+        img2Name = basepath + mat_file_path + video_folder_list[int(concat_row[2])-1] + "/" +  video_folder_list[int(concat_row[2])-1] + number + '.tif'
         img = Image.open(img2Name)
 
         #left, up, right, bottom
@@ -60,27 +88,25 @@ def evaluate_table(mat_file_path):
         imgSel = imgSel.resize((224, 224), Image.LANCZOS)
         imgSel = np.asarray(imgSel).reshape(1, 224, 224, 3)
         image = preprocess_input(imgSel)
-        vgg16_model = VGG16(include_top=False, input_shape=(224, 224, 3))
-        predic = time.time()
+        
         X_after_vgg = vgg16_model.predict(image)
-        print(str(time.time()-predic))
         X_after_vgg.shape
 
         
         x = model.predict(X_after_vgg)
         print("particle id: "+ str(concat_row[3]))
 
-        if x >= 0.9: 
-            print("is Particle")
-        else : 
-            print("not a Particle")
+        #if x >= 0.9: 
+        #    print("is Particle")
+        #else : 
+        #    print("not a Particle")
 
         for i in range(5):
             table_with_result[table_with_result_index][i] = concat_row[i]
         table_with_result[table_with_result_index][5] = x
         table_with_result_index += 1
-        print(str(time.time()-ti))
-    
+        
+        
     scipy.io.savemat('result_mat'+str(concat_row[2])+'.mat',mdict={'concat_ptcl2': table_with_result})
 
 
