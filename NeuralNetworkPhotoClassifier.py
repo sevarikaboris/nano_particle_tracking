@@ -14,6 +14,7 @@ from multiprocessing import Pool
 basepath = "C:/Users/Jerome's Laptop/Desktop/Hauptordner/" #path where experiments are located
 savepath = 'C:/Users/sevar/OneDrive/Radna površina/Data/Fotos/'
 model = load_model("C:/Users/Jerome's Laptop/Desktop/Boris_KI/particle.h5")
+vgg16_model = VGG16(include_top=False, input_shape=(224, 224, 3))
 
 #change this value
 dedrift = False
@@ -116,20 +117,7 @@ if __name__ == '__main__':
     for experiment_dir in os.listdir(basepath):
         experiment_dir += "/"
         print("processing: " + experiment_dir)
-
-        for videos_dir in os.listdir(basepath + experiment_dir):
-            if(not os.path.isdir(basepath + experiment_dir + videos_dir)):
-                continue
-
-            videos_dir += "/"
-            print("videos: "  + videos_dir)
-
-        if not dedrift:
-            file_name = 'tracked_particles.mat'
-        elif dedrift:
-            file_name = 'tracked_particles_dedrift.mat'
-        file_path_name = basepath + experiment_dir + file_name
-        file_dirs.append(file_path_name)
+        file_dirs.append(experiment_dir)
 
     p = Pool()
     result = p.map(evaluate_table, file_dirs)
