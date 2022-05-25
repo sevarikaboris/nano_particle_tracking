@@ -69,7 +69,7 @@ def evaluate_table(mat_file_path):
     for concat_row in concat_ptcl2:
 
         if(random.random()>probability):
-            for i in range(5):
+            for i in range(6):
                 table_with_result[table_with_result_index][i] = concat_row[i]
             table_with_result[table_with_result_index][5] = 10.0
             table_with_result_index += 1
