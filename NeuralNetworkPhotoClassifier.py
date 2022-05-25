@@ -25,7 +25,7 @@ probability = 0.1
 
 
 def evaluate_table(mat_file_path):
-    print("processing: " + mat_file_path)
+    #print("processing: " + mat_file_path)
 
     if not dedrift:
         file_name = '/tracked_particles.mat'
