@@ -51,7 +51,7 @@ def evaluate_table(mat_file_path):
 
         video_folder_list.append("fov" + str(number))
         counter_fov += 1
-    print(video_folder_list)
+    #print(video_folder_list)
 
     #"E:\Particle Set 2\100 nm - C 1.0 - 1\fov1\fov1_0001.tif"
     
