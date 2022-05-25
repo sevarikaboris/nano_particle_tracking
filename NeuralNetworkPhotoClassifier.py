@@ -72,7 +72,7 @@ def evaluate_table(mat_file_path):
         p.join()   
         
         
-    scipy.io.savemat(basepath + mat_file_path + 'result_mat'+'.mat',mdict={'concat_ptcl': table_with_result})
+    scipy.io.savemat(basepath + mat_file_path + 'test_mat'+'.mat',mdict={'concat_ptcl': table_with_result})
 
 def process_mat_file_row(table_with_result, 
                         table_with_result_index, 
