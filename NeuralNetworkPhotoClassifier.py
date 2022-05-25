@@ -9,12 +9,13 @@ from scipy.io import loadmat
 import time
 from multiprocessing import Pool
 import random
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 
 #test commit
 
-basepath = "C:/Users/Jerome's Laptop/Desktop/Hauptordner/" #path where experiments are located
-savepath = 'C:/Users/sevar/OneDrive/Radna površina/Data/Fotos/'
-model = load_model("C:/Users/Jerome's Laptop/Desktop/Boris_KI/particle.h5")
+basepath = "E:/Analyzed/" #path where experiments are located
+model = load_model("C:/Users/sevar/OneDrive/Documents/OneNote/OneDrive/Архив/Research/MIT Project/Microrheology/MPT - new/BorisBoris.h5")
 vgg16_model = VGG16(include_top=False, input_shape=(224, 224, 3))
 
 #change this value
@@ -23,7 +24,7 @@ core_count = 4
 cores_in_use = 0
 file_dirs = list()
 experiment_dir = ""
-probability = 0.1 #%
+probability = 0.1 
 
 def transpose_matrix(matrix):
     return list(map(list, zip(*matrix)))
@@ -39,10 +40,10 @@ def evaluate_table(mat_file_path):
         file_name = '/tracked_particles_dedrift.mat'
 
     mat_file = loadmat(basepath + mat_file_path + file_name)
-    concat_ptcl2 = mat_file['concat_ptcl2'] #read the file
+    concat_ptcl2 = mat_file['concat_ptcl'] #read the file
     
     video_folder_list = list()
-    counter_fov = 0
+    counter_fov = 1
     for videos_fov_dir in os.listdir(basepath + mat_file_path):
         if(not os.path.isdir(basepath + mat_file_path + videos_fov_dir)):
             continue
@@ -55,8 +56,9 @@ def evaluate_table(mat_file_path):
         else:
             number = counter_fov -1
 
-        video_folder_list.append("fov" + number)
-
+        video_folder_list.append("fov" + str(number))
+        counter_fov += 1
+    print(video_folder_list)
 
     #"E:\Particle Set 2\100 nm - C 1.0 - 1\fov1\fov1_0001.tif"
     
@@ -83,8 +85,9 @@ def evaluate_table(mat_file_path):
         else:
             number = '_0' + str(picture_number)
 
-        img2Name = basepath + mat_file_path + video_folder_list[int(concat_row[2])-1] + "/" +  video_folder_list[int(concat_row[2])-1] + number + '.tif'
+        img2Name = basepath + mat_file_path + video_folder_list[int(concat_row[4])-1] + "/" +  video_folder_list[int(concat_row[4])-1] + number + '.tif'
         img = Image.open(img2Name)
+        # img.save("C:/Users/sevar/OneDrive/Radna površina/Save/Test - 1.png","PNG")
 
         #left, up, right, bottom
         heigth = 40
@@ -95,7 +98,11 @@ def evaluate_table(mat_file_path):
         bottom =top + heigth
         
         imgSel = img.crop((left, top, right, bottom))
+        
+
         imgSel = imgSel.resize((224, 224), Image.LANCZOS)
+        # imgSel.save("C:/Users/sevar/OneDrive/Radna površina/Save/Test - 2.jpg")
+        
         imgSel = np.asarray(imgSel).reshape(1, 224, 224, 3)
         image = preprocess_input(imgSel)
         
@@ -106,10 +113,7 @@ def evaluate_table(mat_file_path):
         x = model.predict(X_after_vgg)
         print("particle id: "+ str(concat_row[3]))
 
-        #if x >= 0.9: 
-        #    print("is Particle")
-        #else : 
-        #    print("not a Particle")
+        print(x)
 
         for i in range(5):
             table_with_result[table_with_result_index][i] = concat_row[i]
@@ -117,7 +121,7 @@ def evaluate_table(mat_file_path):
         table_with_result_index += 1
         
         
-    scipy.io.savemat('result_mat'+str(concat_row[2])+'.mat',mdict={'concat_ptcl2': table_with_result})
+    scipy.io.savemat(basepath + mat_file_path + 'result_mat'+'.mat',mdict={'concat_ptcl': table_with_result})
 
 
 if __name__ == '__main__':
@@ -132,9 +136,3 @@ if __name__ == '__main__':
     result = p.map(evaluate_table, file_dirs)
     p.close()
     p.join()
-
-
-                
-            
-
-
