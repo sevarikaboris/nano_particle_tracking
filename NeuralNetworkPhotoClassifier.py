@@ -27,7 +27,6 @@ experiment_dir = ""
 probability = 0.1 
 
 def evaluate_table(mat_file_path):
-    mat_file_path += "/"
     print("processing: " + mat_file_path)
 
     if not dedrift:
@@ -125,7 +124,6 @@ if __name__ == '__main__':
 
     for experiment_dir in os.listdir(basepath):
         experiment_dir += "/"
-        print("processing: " + experiment_dir)
         file_dirs.append(experiment_dir)
 
     p = Pool()
