@@ -26,6 +26,9 @@ file_dirs = list()
 experiment_dir = ""
 probability = 0.1 
 
+def transpose_matrix(matrix):
+    return list(map(list, zip(*matrix)))
+
 def evaluate_table(mat_file_path):
     print("processing: " + mat_file_path)
 
