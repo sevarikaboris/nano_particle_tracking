@@ -32,13 +32,13 @@ def evaluate_table(mat_file_path):
     elif dedrift:
         file_name = '/tracked_particles_dedrift.mat'
 
-    mat_file = loadmat(basepath + mat_file_path + file_name)
+    mat_file = loadmat(mat_file_path + file_name)
     concat_ptcl2 = mat_file['concat_ptcl'] #read the file
     
     video_folder_list = list()
     counter_fov = 1
-    for videos_fov_dir in os.listdir(basepath + mat_file_path):
-        if(not os.path.isdir(basepath + mat_file_path + videos_fov_dir)):
+    for videos_fov_dir in os.listdir(mat_file_path):
+        if(not os.path.isdir(mat_file_path + videos_fov_dir)):
             continue
         
         number = counter_fov
@@ -72,7 +72,7 @@ def evaluate_table(mat_file_path):
         p.join()   
         
         
-    scipy.io.savemat(basepath + mat_file_path + 'test_mat'+'.mat',mdict={'concat_ptcl': table_with_result})
+    scipy.io.savemat(mat_file_path + 'test_mat'+'.mat',mdict={'concat_ptcl': table_with_result})
 
 def process_mat_file_row(table_with_result, 
                         table_with_result_index, 
@@ -126,6 +126,7 @@ if __name__ == '__main__':
         experiment_dir += "/"
         print("processing: " + experiment_dir)
         mat_file_dirs.append(experiment_dir)
+        mat_file_dirs = basepath + experiment_dir
         evaluate_table(mat_file_dirs)
 
     
