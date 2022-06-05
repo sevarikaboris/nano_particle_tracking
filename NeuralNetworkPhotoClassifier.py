@@ -25,6 +25,8 @@ cores_in_use = 0
 file_dirs = list()
 experiment_dir = ""
 probability = 0.1 
+wiederholung = False
+
 
 def transpose_matrix(matrix):
     return list(map(list, zip(*matrix)))
@@ -37,7 +39,10 @@ def evaluate_table(mat_file_path):
     elif dedrift:
         file_name = '/tracked_particles_dedrift.mat'
 
-    mat_file = loadmat(basepath + mat_file_path + file_name)
+    if(not wiederholung):
+        mat_file = loadmat(basepath + mat_file_path + file_name)
+    elif(wiederholung):
+        mat_file = loadmat(basepath + mat_file_path + "result_mat.mat")
     concat_ptcl2 = mat_file['concat_ptcl'] #read the file
     
     video_folder_list = list()
@@ -65,15 +70,28 @@ def evaluate_table(mat_file_path):
     table_with_result_index = 0                 #navigating index 
 
 
-
+    
     for concat_row in concat_ptcl2:
 
-        if(random.random()>probability):
-            for i in range(6):
-                table_with_result[table_with_result_index][i] = concat_row[i]
-            table_with_result[table_with_result_index][5] = 10.0
-            table_with_result_index += 1
-            continue
+        if(wiederholung):
+            if(concat_row[5] != 10): #fill in the same results as before
+                for i in range(6):
+                    table_with_result[table_with_result_index][i] = concat_row[i]
+                table_with_result_index += 1
+                continue
+            else:                   #is 10 so I have to handle it
+                if(random.random()>probability):
+                    for i in range(6):
+                        table_with_result[table_with_result_index][i] = concat_row[i]
+                    table_with_result_index += 1
+                    continue
+        else:
+            if(random.random()>probability):
+                for i in range(6):
+                    table_with_result[table_with_result_index][i] = concat_row[i]
+                table_with_result[table_with_result_index][5] = 10.0
+                table_with_result_index += 1
+                continue
 
         picture_number = int(concat_row[2])
         if picture_number <10:
